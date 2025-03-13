@@ -33,6 +33,8 @@ client = AsyncIOMotorClient(MONGO_URI)
 db = client["Task"]
 task_collection = db["Task_data"]
 
+app = FastAPI()
+
 # Request Model
 class QueryRequest(BaseModel):
     query: str
