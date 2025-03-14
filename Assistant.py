@@ -81,7 +81,7 @@ def process_text(tasks: List[Dict[str, Any]]):
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
     index = faiss.IndexFlatL2(768)
     vector_store = FAISS(
-        embedding_function=embeddings.embed_query,
+        embedding_function=embeddings,
         index=index,
         docstore=InMemoryDocstore(),
         index_to_docstore_id={},
@@ -129,11 +129,12 @@ async def chat(query_request: QueryRequest):
     retriever = vectorstore.as_retriever()
 
     # Initialize LLM with dynamic model selection
-    llm = HuggingFaceEndpoint(
+   llm = HuggingFaceEndpoint(
         repo_id=MODEL_MAP[query_request.model],  # Dynamically select model
-        token=huggingface_api_key,
+        model_kwargs={"token" : huggingface_api_key},
         temperature=0.6
     )
+
 
     # Custom prompt for optimization queries
     if any(keyword in query_lower for keyword in ["how to complete", "faster", "optimize", "decrease project time"]):
